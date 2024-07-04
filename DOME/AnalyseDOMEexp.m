@@ -10,7 +10,7 @@ data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Resea
 % data_folder = ['C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\Euglena_OFF\combo'];
 % data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_75_ON\combo';
 experiments_folder="C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\";
-experiments_names=["Euglena_75_ON\combo","Euglena_150_ON\combo","Euglena_255_ON\combo"];
+experiments_names={"Euglena_255_ON\combo"};%{"Euglena_75_ON\combo","Euglena_150_ON\combo","Euglena_255_ON\combo"}; %{"\Euglena_switch_10\combo5"};
 
 
 % FOR FAST SWITCH BETWEEN FOLDERS
@@ -48,7 +48,7 @@ dT = 0.01;
 % current_folder = fileparts(which('Launcher'));
 % addpath(genpath(current_folder));
 
-data_folder = strcat(experiments_folder,experiments_names(exp));
+data_folder = strcat(experiments_folder,experiments_names{exp});
 % Load longitudinal, angular velocities and the light inputs in time
 speed  = load(fullfile(data_folder,'speeds_smooth.txt'));
 omega  = load(fullfile(data_folder,'ang_vel_smooth.txt'));
@@ -59,7 +59,7 @@ inputs = load(fullfile(data_folder,'inputs.txt'));
 % omega = abs(omega)./median(median(abs(omega(1:60,:)),2,'omitnan'),'omitnan');
 
 
-plot_data = true;                                   %Flag to plot the experimental data
+plot_data = false;                                   %Flag to plot the experimental data
 stat_an = true;
 N = size(speed,2);                                  %Number of Agents
 timeInstants = [0:size(speed,1)-1] * deltaT;        %Time vecor
@@ -167,7 +167,7 @@ if stat_an
     % ylabel('Probability');
     % legend(sprintf("OFF (%ds before switch)",t_b),sprintf("ON (%ds before switch)",t_b))
     set(gca,'FontSize',14);
-
+ 
 
     figure("Name","Speed alpha (BoxPlot)","Position",[sc_w/4 offs sc_w/4 sc_h/3]);
 
@@ -337,22 +337,27 @@ if plot_data
     figure % TIME PLOT - SPEED and ANGULAR VELOCITY
     subplot(2,1,1)
     xlim([0,max(timeInstants)])
-    % ylim([0,120])
+    ylim([0,120])
+    l1=plotWithShade(timeInstants, median(speed,2,'omitnan'), quantile(speed, 0.1, 2), quantile(speed, 0.9, 2), 'b', 0.3);
+    hold on;
+    plot(timeInstants,u,'LineWidth',2,'Color','blue');
     if isvarname('u')
         highlightInputs(timeInstants, u, 'r', 0.25)
     end
-    l1=plotWithShade(timeInstants, median(speed,2,'omitnan'), quantile(speed, 0.1, 2), quantile(speed, 0.9, 2), 'b', 0.3);
     xlabel('$t$ [s]','Interpreter','Latex','FontSize',16)
-    ylabel('$v$ [$\mu$m/s]','Interpreter','Latex','FontSize',16)
+    % ylabel('$v$ [$\mu$m/s]','Interpreter','Latex','FontSize',16)
+    ylabel('$u$','Interpreter','Latex','FontSize',16)
+
     rng=ylim;
     box on
     subplot(2,1,2)
     xlim([0,max(timeInstants)])
     ylim([0,2])
+    l1=plotWithShade(timeInstants, median(abs(omega),2,'omitnan'), quantile(abs(omega), 0.1, 2), quantile(abs(omega), 0.9, 2), 'b', 0.3);
+    hold on;
     if isvarname('u')
         highlightInputs(timeInstants, u, 'r', 0.25)
     end
-    l1=plotWithShade(timeInstants, median(abs(omega),2,'omitnan'), quantile(abs(omega), 0.1, 2), quantile(abs(omega), 0.9, 2), 'b', 0.3);
     xlabel('$t$ [s]','Interpreter','Latex','FontSize',16)
     ylabel('$|\omega|$ [rad/s]','Interpreter','Latex','FontSize',16)
     rng=ylim;

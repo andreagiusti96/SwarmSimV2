@@ -41,7 +41,7 @@ p =gca;
 hold on;
 for i=1:min([size(xp,1),size(x,1)])
     ang = atan2(x(i,2)-xp(i,2),x(i,1)-xp(i,1));
-    plot_singleRod(x(i,:),ang,28,12);
+    plot_singleRod(x(i,:),ang,60,25);
 end
 
 

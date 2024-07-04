@@ -21,16 +21,31 @@ tag='switch_10'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli 
 % tag='switch_5'; data_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_switch_5/combo';  % switch5s combo
 % tag='switch_1'; data_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_switch_1/combo';  % switch1s combo
 % tag='75_ON'; data_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_75_ON/combo';  % OFF-ON-OFF 75 combo
-% tag='150_ON'; data_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_150_ON/combo';  % OFF-ON-OFF 150 combo
-% tag='255_ON'; data_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_255_ON/combo';  % OFF-ON-OFF 255 combo
-% tag='OFF'; data_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_OFF/combo';  % OFF combo
-% tag='ramp'; data_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_ramp/combo';  % ramp combo
+% tag='switch_5'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_switch_5\combo';  % switch5s combo
+% tag='switch_1'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_switch_1\combo';  % switch1s combo
+% tag='75_ON'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_75_ON\combo';  % OFF-ON-OFF 75 combo
+% tag='150_ON'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_150_ON\combo';  % OFF-ON-OFF 150 combo
+% tag='255_ON'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_255_ON\combo';  % OFF-ON-OFF 255 combo
+% tag='OFF'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_OFF\combo';  % OFF combo
+% tag='ramp'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_ramp\combo';  % ramp combo
 
-id_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\Euglena_switch_10\combo3';  % folder with identification data
-%id_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_switch_10/combo5_old';  % folder with identification data
-identification_file_name = 'identification_GA_bga4.txt';
+% tag='half_half';          data_folder = 'D:\DOME\Experiments\2023_06_14_E_6';    Environment.boundary = Simulation.arena * 2;
+% tag='grad_centr_light';   data_folder = 'D:\DOME\Experiments\2023_06_12_E_3';    Environment.boundary = Simulation.arena * 2;
+% tag='grad_centr_dark';    data_folder = 'D:\DOME\Experiments\2023_06_14_E_10';   Environment.boundary = Simulation.arena * 2;
+% tag='grad_lateral';       data_folder = 'D:\DOME\Experiments\2023_06_13_E_16';   Environment.boundary = Simulation.arena * 2;
+% tag='circle_dark';        data_folder = 'D:\DOME\Experiments\2023_06_13_E_15';   Environment.boundary = Simulation.arena * 2;
+tag='BCL';                data_folder = 'D:\DOME\Experiments\2023_07_10_E_30';   Environment.boundary = Simulation.arena * 2;
 
-outputDir = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\Euglena_switch_10\sim';
+% tag = 'no_light_response';
+    
+id_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\identifications\2024_06_17_GB_absw_noalpha_narrow';  % folder with identification data
+identification_file_name = 'identification_GB_absw_noalpha_narrow.txt';
+% identification_file_name = 'identification_manual.txt';
+% identification_file_name = 'identification_GB_median.txt';
+% id_folder = '/Volumes/DOMEPEN/Experiments/2023_06_15_Euglena_7/tracking_2023_10_16'; % switch10s
+% identification_file_name = 'identification_GB_absw_alpha.txt';
+
+outputDir = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\Simulations';
 % outputDir = '/Users/andrea/Library/CloudStorage/OneDrive-UniversitàdiNapoliFedericoII/Andrea_Giusti/Projects/DOME/simulations/comparison/Identifications';
 % [~,simulation_name,~]=fileparts(identification_file_name);
 
@@ -133,6 +148,9 @@ omega = omega_be;
 xFinal_inWindow = squeeze(xVec(end,(xVec(end,:,1)>-Simulation.arena(1)/2 & xVec(end,:,1)<Simulation.arena(1)/2 ...
                         & xVec(end,:,2)>-Simulation.arena(2)/2 & xVec(end,:,2)<Simulation.arena(2)/2),:));
 
+xFinalp_inWindow = squeeze(xVec(end-1,(xVec(end,:,1)>-Simulation.arena(1)/2 & xVec(end,:,1)<Simulation.arena(1)/2 ...
+                        & xVec(end,:,2)>-Simulation.arena(2)/2 & xVec(end,:,2)<Simulation.arena(2)/2),:));
+
                     
 %% PLOTS
 
@@ -184,7 +202,8 @@ end
 if isfield(LocalIntFunction, 'DistanceRange')
     plotSwarmInit(x0, 0, LocalIntFunction.DistanceRange(1), LocalIntFunction.DistanceRange(2), Simulation.arena);
 else
-    plotSwarmInit(x0, 0, inf, inf, Simulation.arena);
+    % plotRodsInit(x0,x0,0,Simulation.arena);
+    % plotSwarmInit(x0, 0, inf, inf, Simulation.arena);
 end
 if Simulation.drawTraj; plotTrajectory(xVec, false, [0,0.7,0.9], Simulation.drawTraj); end
 if outputDir
@@ -197,6 +216,9 @@ figure
 if isfield(Environment,'Inputs') && isfield(Environment.Inputs,'Points')
     plotEnvField(Environment.Inputs.Points, Environment.Inputs.Values, Simulation.arena)
 end
+if Simulation.drawTraj; plotTrajectory(xVec(size(xVec,1)-15:size(xVec,1),:,:), false, [0,0.7,0.9], Simulation.drawTraj); end
+hold on;
+if Simulation.drawTraj; scatterTrajectory(xVec(size(xVec,1)-15:size(xVec,1),:,:), false, [0,0.7,0.9], Simulation.drawTraj); end
 if isfield(LocalIntFunction, 'DistanceRange')
     plotSwarmInit(xFinal_inWindow, Simulation.Tmax, LocalIntFunction.DistanceRange(1), LocalIntFunction.DistanceRange(2), Simulation.arena);
 else
