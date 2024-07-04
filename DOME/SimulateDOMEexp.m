@@ -15,12 +15,10 @@ clear
 
 defaultParamMicroorg;               % load default parameters yo simulate microorganisms
 
+
 % tag='switch_10'; data_folder = '/Volumes/DOMEPEN/Experiments/2023_07_10_Euglena_15/tracking_2023_10_12';  % switch10s
 tag='switch_10'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\Euglena_switch_10\combo5'; % switch10s combo
 % tag='switch_10'; data_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_switch_10/combo5';  % switch10s combo 5
-% tag='switch_5'; data_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_switch_5/combo';  % switch5s combo
-% tag='switch_1'; data_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_switch_1/combo';  % switch1s combo
-% tag='75_ON'; data_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_75_ON/combo';  % OFF-ON-OFF 75 combo
 % tag='switch_5'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_switch_5\combo';  % switch5s combo
 % tag='switch_1'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_switch_1\combo';  % switch1s combo
 % tag='75_ON'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_75_ON\combo';  % OFF-ON-OFF 75 combo
@@ -29,10 +27,12 @@ tag='switch_10'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli 
 % tag='OFF'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_OFF\combo';  % OFF combo
 % tag='ramp'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_ramp\combo';  % ramp combo
 
+
 % tag='half_half';          data_folder = 'D:\DOME\Experiments\2023_06_14_E_6';    Environment.boundary = Simulation.arena * 2;
 % tag='grad_centr_light';   data_folder = 'D:\DOME\Experiments\2023_06_12_E_3';    Environment.boundary = Simulation.arena * 2;
 % tag='grad_centr_dark';    data_folder = 'D:\DOME\Experiments\2023_06_14_E_10';   Environment.boundary = Simulation.arena * 2;
 % tag='grad_lateral';       data_folder = 'D:\DOME\Experiments\2023_06_13_E_16';   Environment.boundary = Simulation.arena * 2;
+% tag='circle_light';         data_folder = 'D:\DOME\Experiments\2023_07_10_E_26';            Environment.boundary = Simulation.arena * 2;
 % tag='circle_dark';        data_folder = 'D:\DOME\Experiments\2023_06_13_E_15';   Environment.boundary = Simulation.arena * 2;
 tag='BCL';                data_folder = 'D:\DOME\Experiments\2023_07_10_E_30';   Environment.boundary = Simulation.arena * 2;
 
@@ -222,7 +222,8 @@ if Simulation.drawTraj; scatterTrajectory(xVec(size(xVec,1)-15:size(xVec,1),:,:)
 if isfield(LocalIntFunction, 'DistanceRange')
     plotSwarmInit(xFinal_inWindow, Simulation.Tmax, LocalIntFunction.DistanceRange(1), LocalIntFunction.DistanceRange(2), Simulation.arena);
 else
-    plotSwarmInit(xFinal_inWindow, Simulation.Tmax, inf, inf, Simulation.arena);
+    plotRodsInit(xFinal_inWindow,xFinalp_inWindow,Simulation.Tmax,Simulation.arena);
+    % plotSwarmInit(xFinal_inWindow, Simulation.Tmax, inf, inf, Simulation.arena);
 end
 if Simulation.drawTraj; plotTrajectory(xVec, false, [0,0.7,0.9], Simulation.drawTraj); end
 if outputDir

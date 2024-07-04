@@ -25,22 +25,25 @@ D=2;                        % number of dimensions [2 or 3]
 
 %% Analysis options
 smoothing = false;          % smooth temporal data with moving average
-brightness_thresh = 0.3;
 brightness_thresh = 0.3;    % brightness threshold for object detection (spatial experiments)
+background_sub = true;      % use background subtraction for object detection (spatial experiments)
+pattern_blurring = 15;      % blurring of the spatial input pattern (spatial experiments)
+px_size = 1.25;
 
 %% Simulation parameters
 % All these fields are mandatory
 Simulation=struct();
-Simulation.arena = [1920,1080]; % size of the simulation window
 Simulation.Tmax = 180;                      % maximum simulation time
 Simulation.deltaT = 0.5;                    % sampling time step
 Simulation.dT =     0.01;                   % integration time step
 Simulation.arena = [1920,1080]*px_size*3;     % size of the simulation window
+Simulation.drawON=false;                    % draw swarm during simulation (if N is large slows down the simulation)
+Simulation.drawTraj=0;                      % draw trajectories of the agents (if N is large slows down the simulation)
+Simulation.recordVideo=false;               % record video of the simulation (if true drawON must be true)
 Simulation.timeInstants = [0:Simulation.deltaT:Simulation.Tmax];
 
 %% Initial conditions
 % Initial positions
-delta=1;               % maximum displacement of the initial positions. delta<=(Rmax-1)/2 preserves all the links
 delta=1;                                                                            % maximum displacement of the initial positions. delta<=(Rmax-1)/2 preserves all the links
 %x0=randCircle(N, 1000, D);                                                         % initial conditions drawn from a uniform disc
 x0=randRect(N, Simulation.arena*2, D);                                              % initial conditions drawn from a rectangle
