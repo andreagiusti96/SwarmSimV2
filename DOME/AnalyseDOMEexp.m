@@ -5,19 +5,19 @@ close all
 
 
 % Add the path to your data
-% experiments_folder="C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\";    % DAVIDE
-experiments_folder="/Volumes/DOMEPEN/Experiments/comparisons";                                          % ANDREA
+experiments_folder="C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons";    % DAVIDE
+% experiments_folder="/Volumes/DOMEPEN/Experiments/comparisons";                                          % ANDREA
 
-% experiments_names=[fullfile("Euglena_75_ON","combo"),fullfile("Euglena_150_ON","combo"),fullfile("Euglena_255_ON","combo")];
+experiments_names=[fullfile("Euglena_75_ON","combo"),fullfile("Euglena_150_ON","combo"),fullfile("Euglena_255_ON","combo")];
 % experiments_names=[fullfile("Volvox_255_ON","combo")];
-experiments_names=[fullfile("Volvox_switch_10","combo5")];
+% experiments_names=[fullfile("Euglena_ramp","combo")];
 
 
-plot_data = true;                                   % Flag to plot the experimental data
+plot_data = false;                                   % Flag to plot the experimental data
 stat_an = true;
 
-t_a = 5;                                            % Time window after the switch I want to analyse
-t_b = 5;                                            % Time window before the switch I want to analyse
+t_a = 10;                                            % Time window after the switch I want to analyse
+t_b = 40;                                            % Time window before the switch I want to analyse
 
 
 deltaT = 0.5;
@@ -70,7 +70,7 @@ for exp=1:length(experiments_names)
     switchn_t = find(u_dotn);                                %Find all the switch on times
     switchp_t = find(u_dotp);                                %Find all the switch on times
     
-    for i=1:length(switchn_t)-1
+    for i=1:length(switchn_t)
         s_aftern{exp}  = [s_aftern{exp};  speed(switchn_t(i):switchn_t(i)+round(t_a/deltaT),:)];
         s_beforen{exp} = [s_beforen{exp}; speed(switchn_t(i)-round(t_b/deltaT):switchn_t(i),:)];
         w_aftern{exp}  = [w_aftern{exp};  abs(omega(switchn_t(i):switchn_t(i)+round(t_a/deltaT),:))];
@@ -78,7 +78,7 @@ for exp=1:length(experiments_names)
     end
     
     
-    for i=1:length(switchp_t)-1
+    for i=1:length(switchp_t)
         s_afterp{exp}  = [s_afterp{exp};  speed(switchp_t(i):switchp_t(i)+round(t_a/deltaT),:)];
         s_beforep{exp} = [s_beforep{exp}; speed(switchp_t(i)-round(t_b/deltaT):switchp_t(i),:)];
         w_afterp{exp}  = [w_afterp{exp};  abs(omega(switchp_t(i):switchp_t(i)+round(t_a/deltaT),:))];
@@ -320,7 +320,7 @@ for exp=1:length(experiments_names)
         end
         
         figure % TIME PLOT - SPEED and ANGULAR VELOCITY
-        subplot(2,1,1)
+        subplot(2,1,1);
         hold on
         xlim([0,max(timeInstants)])
         ylim([0,250])
@@ -342,6 +342,13 @@ for exp=1:length(experiments_names)
         xlabel('$t$ [s]','Interpreter','Latex','FontSize',16)
         ylabel('$|\omega|$ [rad/s]','Interpreter','Latex','FontSize',16)
         rng=ylim;
+        % subplot(7,1,1)
+        % xlim([0,max(timeInstants)])
+        % ylim([0,250])
+        % if isvarname('u')
+        %     highlightInputs(timeInstants, u, 'r', 0.25)
+        % end
+        % xticklabels({});
         box on
         if isfolder(outputDir)
             saveas(gcf,fullfile(outputDir, 'time_plot'))

@@ -8,7 +8,7 @@
 %
 
 %% Clear environment
-close all
+% close all
 clear
 
 %% Parameters
@@ -23,7 +23,7 @@ defaultParamMicroorg;               % load default parameters to simulate microo
 
 % tag='switch_10'; data_folder = '/Volumes/DOMEPEN/Experiments/2023_06_15_Euglena_7/tracking_2023_10_16';  % switch10s
 % tag='switch_10'; data_folder = '/Volumes/DOMEPEN/Experiments/comparisons/Euglena_switch_10/combo3';  % switch10s combo
-tag='switch_10'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\Euglena_switch_10\combo5';  % switch10s combo 5
+% tag='switch_10'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\Euglena_switch_10\combo5';  % switch10s combo 5
 % tag='switch_5'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_switch_5\combo';  % switch5s combo
 % tag='switch_1'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_switch_1/combo';  % switch1s combo
 % tag='75_ON'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\comparisons\Euglena_75_ON/combo';  % OFF-ON-OFF 75 combo
@@ -37,8 +37,8 @@ tag='switch_10'; data_folder = 'C:\Users\david\OneDrive - Università di Napoli 
 % tag='grad_centr_dark';    data_folder = '/Volumes/DOMEPEN/Experiments/2023_06_14_E_10';   Environment.boundary = Simulation.arena * 2;
 % tag='grad_lateral';       data_folder = '/Volumes/DOMEPEN/Experiments/2023_06_13_E_16';   Environment.boundary = Simulation.arena * 2;
 % tag='circle_light';       data_folder = '/Volumes/DOMEPEN/Experiments/2023_07_10_E_26';   Environment.boundary = Simulation.arena * 2;
-% tag='circle_dark';        data_folder = '/Volumes/DOMEPEN/Experiments/2023_06_13_E_15';   Environment.boundary = Simulation.arena * 2;
-% tag='BCLx36';             data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\2023_07_10_E_34'; N=N*2; Simulation.arena=Simulation.arena*2.5; Environment.boundary = Simulation.arena * 2; x0=randRect(N, Simulation.arena*2, D);
+% tag='circle_dark';        data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\2023_06_13_E_15';   Environment.boundary = Simulation.arena * 2;
+tag='BCLx36';             data_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\2023_07_10_E_34'; N=N*2; Simulation.arena=Simulation.arena*2.5; Environment.boundary = Simulation.arena * 2; x0=randRect(N, Simulation.arena*2, D);
     
 id_folder = 'C:\Users\david\OneDrive - Università di Napoli Federico II\Research\Data\DOME\identifications\2024_06_17_GB_absw_noalpha_narrow';  % folder with identification data
 identification_file_name = 'identification_GB_absw_noalpha_narrow.txt';
@@ -87,6 +87,21 @@ else                                            % spatial inputs
     Environment.Inputs.Points = {linspace(-Simulation.arena(1),Simulation.arena(1),size(u,1))/2, linspace(-Simulation.arena(2),Simulation.arena(2),size(u,2))/2};
     Environment.Inputs.Values = flip(u,2);
 end
+
+%Defining a spatial gradient (left to right)
+Environment.Inputs.Points = {linspace(-Simulation.arena(1),Simulation.arena(1),600)/2, linspace(-Simulation.arena(2),Simulation.arena(2),600)/2};
+
+radii = 1000;
+% radii = 3000;
+Environment.Inputs.Values={};
+for i=1:length(radii)
+    [X,Y]= meshgrid(Environment.Inputs.Points{1},Environment.Inputs.Points{2});
+    Environment.Inputs.Values{i}= 0.5*double((X.^2 + Y.^2 >= radii(i)^2)) + 0.5*double((X.^2 + Y.^2 >= (0.5*radii(i))^2)); 
+end
+Environment.Inputs.Times = linspace(0,160,3);
+Environment.Inputs.Times = 0;
+
+
 
 %% Create Initial Conditions
 %rng(1,'twister'); % set the randomn seed to have reproducible results
@@ -149,9 +164,6 @@ omega = omega_be;
                     
 %% PLOTS
 
-
-
-
 [~,indices_inWindow] = getInWindow(squeeze(xVec(end,:,:)), Simulation.arena);
 xFinal_inWindow = squeeze(xVec(end,indices_inWindow,:));
 xSemiFinal_inWindow = squeeze(xVec(end-1,indices_inWindow,:));
@@ -201,7 +213,7 @@ if isfield(Environment,'Inputs') && isfield(Environment.Inputs,'Points')
 % SWARM initial
 figure
 if isfield(Environment,'Inputs') && isfield(Environment.Inputs,'Points')
-    plotEnvField(Environment.Inputs.Points, Environment.Inputs.Values, Simulation.arena)
+    plotEnvField(Environment.Inputs.Points, Environment.Inputs.Values{1}, Simulation.arena)
 end
 if Simulation.drawTraj; plotTrajectory(xVec, false, [0,0.7,0.9], Simulation.drawTraj); end
 if isfield(LocalIntFunction, 'DistanceRange')
@@ -218,7 +230,7 @@ end
 % SWARM final
 figure
 if isfield(Environment,'Inputs') && isfield(Environment.Inputs,'Points')
-    plotEnvField(Environment.Inputs.Points, Environment.Inputs.Values, Simulation.arena)
+    plotEnvField(Environment.Inputs.Points, Environment.Inputs.Values{end}, Simulation.arena)
 end
 if Simulation.drawTraj; plotTrajectory(xVec, false, [0,0.7,0.9], Simulation.drawTraj); end
 if isfield(LocalIntFunction, 'DistanceRange')
@@ -254,7 +266,7 @@ end
 % SPATIAL INPUTS
 if isfield(Environment,'Inputs') && isfield(Environment.Inputs,'Points')
     window = [-Simulation.arena(1),Simulation.arena(1),-Simulation.arena(2),Simulation.arena(2)]/2;
-    [density_by_input_sim, bins, norm_slope_sim, c_coeff_sim, coefficents, ~,~, u_values_sim] = agentsDensityByInput(Environment.Inputs.Points, Environment.Inputs.Values, xFinal_inWindow, window);
+    [density_by_input_sim, bins, norm_slope_sim, c_coeff_sim, coefficents, ~,~, u_values_sim] = agentsDensityByInput(Environment.Inputs.Points, Environment.Inputs.Values{end}, xFinal_inWindow, window);
     
     figure % simulation light distribution
     bar((bins(1:end-1)+bins(2:end))/2,density_by_input_sim, 1)
@@ -274,76 +286,96 @@ if isfield(Environment,'Inputs') && isfield(Environment.Inputs,'Points')
         saveas(gcf, fullfile(output_path, 'light_distribution'),'png')
     end
     
-    % get distribution wrt light intensity
-    mask = detectObjects(data_folder, background_sub, brightness_thresh);
-    [density_by_input_exp, bins, norm_slope_exp, c_coeff_exp, coefficents, ~,~, u_values_exp] = agentsDensityByInput(Environment.Inputs.Points, Environment.Inputs.Values, mask, window);
-
-    figure
-    x_vec = linspace(window(1),window(2),size(mask,2));
-    y_vec = linspace(window(3),window(4),size(mask,1));
-    box on    
-    hold on
-    cmap = linspace2([1,1,1], [1,0.5,0.5], 100)';
-    colormap(cmap)
-    imagesc(x_vec,y_vec,flip(u'))
-    I=imagesc(x_vec,y_vec,cat(3,zeros(size(mask)),zeros(size(mask)),mask));
-    set(I, 'AlphaData', mask);
-    axis('equal')
-    axis(window)
-    xticks([])
-    yticks([])
-    title('Experimental')
-    if outputDir
-        saveas(gcf, fullfile(output_path, 'exp_positions'))
-        saveas(gcf, fullfile(output_path, 'exp_positions'),'png')
-    end
-    
-    figure % experimental light distribution
-    bar((bins(1:end-1)+bins(2:end))/2,density_by_input_exp, 1)
-    hold on
-    plot(bins,coefficents(1)+coefficents(2)*bins,LineWidth=2);
-    xlabel('Input intensity')
-    ylabel('Density of agents')
-    yticks([0:0.25:1]);
-    text(max(bins),max(density_by_input_exp)*1.1,['\rho=',num2str(c_coeff_exp,'%.2f')],'HorizontalAlignment','right','FontSize',14)
-    text(max(bins),max(density_by_input_exp)*1.05,['norm slope=',num2str(norm_slope_exp,'%.2f')],'HorizontalAlignment','right','FontSize',14)
-    ylim([0,max(density_by_input_exp)*1.15])
-    xlim([-0.1,1.1])
-    xticks(round(bins,2))
-    title('Experimental light distribution')
-    box
-    if outputDir
-        saveas(gcf, fullfile(output_path, 'exp_light_distribution'))
-        saveas(gcf, fullfile(output_path, 'exp_light_distribution'),'png')
-    end
-    
-    figure % difference between light distribution
-    tvd = 0.5 * norm(density_by_input_exp-density_by_input_sim,1); % Total Variation Distance
-    hold on
-    b_exp = bar((bins(1:end-1)+bins(2:end))/2,density_by_input_exp, 1, FaceColor = 'b', FaceAlpha = 0.5);
-    b_sim = bar((bins(1:end-1)+bins(2:end))/2,density_by_input_sim, 1, FaceColor = 'k', FaceAlpha = 0.4);
-    %[f,xi] = ksdensity(u_values_exp, support=[-0.001,1.001], BoundaryCorrection='reflection');
-    %f=f/sum(f);
-    %plot(xi,f)
-    legend({'REAL','SIMULATED'},'FontSize',14)
-    xlabel('Input intensity','FontSize',14)
-    ylabel('Density of agents','FontSize',14)
-    yticks([0:0.25:1]);
-    text(mean(bins),max(density_by_input_exp)*1.10,['TVD=',num2str(tvd,'%.2f')],'HorizontalAlignment','center','FontSize',14)
-    ylim([0,max(density_by_input_exp)*1.15])
-    xlim([-0.1,1.1])
-    xticks(round(bins,2))
-    box
-    if outputDir
-        saveas(gcf, fullfile(output_path, 'difference_light_distribution'))
-        saveas(gcf, fullfile(output_path, 'difference_light_distribution'),'png')
-    end
+    % % get distribution wrt light intensity
+    % mask = detectObjects(data_folder, background_sub, brightness_thresh);
+    % [density_by_input_exp, bins, norm_slope_exp, c_coeff_exp, coefficents, ~,~, u_values_exp] = agentsDensityByInput(Environment.Inputs.Points, Environment.Inputs.Values, mask, window);
+    % 
+    % figure
+    % x_vec = linspace(window(1),window(2),size(mask,2));
+    % y_vec = linspace(window(3),window(4),size(mask,1));
+    % box on    
+    % hold on
+    % cmap = linspace2([1,1,1], [1,0.5,0.5], 100)';
+    % colormap(cmap)
+    % imagesc(x_vec,y_vec,flip(u'))
+    % I=imagesc(x_vec,y_vec,cat(3,zeros(size(mask)),zeros(size(mask)),mask));
+    % set(I, 'AlphaData', mask);
+    % axis('equal')
+    % axis(window)
+    % xticks([])
+    % yticks([])
+    % title('Experimental')
+    % if outputDir
+    %     saveas(gcf, fullfile(output_path, 'exp_positions'))
+    %     saveas(gcf, fullfile(output_path, 'exp_positions'),'png')
+    % end
+    % 
+    % figure % experimental light distribution
+    % bar((bins(1:end-1)+bins(2:end))/2,density_by_input_exp, 1)
+    % hold on
+    % plot(bins,coefficents(1)+coefficents(2)*bins,LineWidth=2);
+    % xlabel('Input intensity')
+    % ylabel('Density of agents')
+    % yticks([0:0.25:1]);
+    % text(max(bins),max(density_by_input_exp)*1.1,['\rho=',num2str(c_coeff_exp,'%.2f')],'HorizontalAlignment','right','FontSize',14)
+    % text(max(bins),max(density_by_input_exp)*1.05,['norm slope=',num2str(norm_slope_exp,'%.2f')],'HorizontalAlignment','right','FontSize',14)
+    % ylim([0,max(density_by_input_exp)*1.15])
+    % xlim([-0.1,1.1])
+    % xticks(round(bins,2))
+    % title('Experimental light distribution')
+    % box
+    % if outputDir
+    %     saveas(gcf, fullfile(output_path, 'exp_light_distribution'))
+    %     saveas(gcf, fullfile(output_path, 'exp_light_distribution'),'png')
+    % end
+    % 
+    % figure % difference between light distribution
+    % tvd = 0.5 * norm(density_by_input_exp-density_by_input_sim,1); % Total Variation Distance
+    % hold on
+    % b_exp = bar((bins(1:end-1)+bins(2:end))/2,density_by_input_exp, 1, FaceColor = 'b', FaceAlpha = 0.5);
+    % b_sim = bar((bins(1:end-1)+bins(2:end))/2,density_by_input_sim, 1, FaceColor = 'k', FaceAlpha = 0.4);
+    % %[f,xi] = ksdensity(u_values_exp, support=[-0.001,1.001], BoundaryCorrection='reflection');
+    % %f=f/sum(f);
+    % %plot(xi,f)
+    % legend({'REAL','SIMULATED'},'FontSize',14)
+    % xlabel('Input intensity','FontSize',14)
+    % ylabel('Density of agents','FontSize',14)
+    % yticks([0:0.25:1]);
+    % text(mean(bins),max(density_by_input_exp)*1.10,['TVD=',num2str(tvd,'%.2f')],'HorizontalAlignment','center','FontSize',14)
+    % ylim([0,max(density_by_input_exp)*1.15])
+    % xlim([-0.1,1.1])
+    % xticks(round(bins,2))
+    % box
+    % if outputDir
+    %     saveas(gcf, fullfile(output_path, 'difference_light_distribution'))
+    %     saveas(gcf, fullfile(output_path, 'difference_light_distribution'),'png')
+    % end
     
 else % TEMPORAL INPUTS
 
     [metrics_of_interest] = compareResults({data_folder,output_path}, output_path, true, Render);
 
 end
+
+
+
+for i=1:length(Render.all_time)
+    %Compute PhI at every time instant
+
+    cur_ind = max([Render.all_time(i)/Simulation.deltaT,2]);
+    [~,indices_inWindow] = getInWindow(squeeze(xVec(cur_ind,:,:)), Simulation.arena);
+    x_cur = squeeze(xVec(cur_ind,indices_inWindow,:));
+    time = find(Environment.Inputs.Times<=Render.all_time(i),1,'last');
+    [~, ~, norm_slope_sim(i), ~, ~, ~,~, ~] = agentsDensityByInput(Environment.Inputs.Points, Environment.Inputs.Values{time}, x_cur, window);
+
+end
+figure(5);
+hold on;
+plot(Render.all_time,movmean(norm_slope_sim,20),'LineWidth',2);
+hold on;
+xlabel('Time [s]','FontSize',14)
+ylabel('PhI','FontSize',14)
+xlim([0, Simulation.Tmax]);
 
 % figure % TIME PLOT - SPEED and ANGULAR VELOCITY
 % subplot(2,4,[1 2 3])

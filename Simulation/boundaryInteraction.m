@@ -1,15 +1,19 @@
 function [x, v, out_agents] = boundaryInteraction(x, v, boundary)
     out_agents = false(size(x));
     for dim = 1:length(boundary)
-        out_agents(:,dim) = abs(x(:,dim)) >  boundary(dim)/2;
+        out_agents_u(:,dim) = x(:,dim) >  boundary(dim)/2;
+        out_agents_d(:,dim) = x(:,dim) < -boundary(dim)/2;
     end
+
     
     for dim = 1:length(boundary)
-        x(out_agents(:,dim),dim) = min(x(out_agents(:,dim),dim), boundary(dim)/2);
-        x(out_agents(:,dim),dim) = max(x(out_agents(:,dim),dim), -boundary(dim)/2);
+        x(out_agents_u(:,dim),dim) = min(x(out_agents_u(:,dim),dim), boundary(dim)/2);
+        x(out_agents_d(:,dim),dim) = max(x(out_agents_d(:,dim),dim), -boundary(dim)/2);
         
-        %v(out_agents(:,dim),dim) = -x(out_agents(:,dim))/10000; % boundary repulsion
-        v(out_agents(:,dim),dim) = 0;
+        v(out_agents_u(:,dim),dim) = v(out_agents_u(:,dim),dim) .* -sign(v(out_agents_u(:,dim),dim));
+        v(out_agents_d(:,dim),dim) = v(out_agents_d(:,dim),dim) .* sign(v(out_agents_d(:,dim),dim));
+
+        
     end
     
     

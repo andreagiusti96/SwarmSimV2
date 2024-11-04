@@ -39,7 +39,7 @@ arguments
     shape       string                      = "."
     radius      double {mustBePositive}     = 20
     xPrevious   double                      = x
-    color       double                      = [1 0 0]
+    color       double                      = [255 214 0]/255
 end
     %figure
     

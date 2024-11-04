@@ -1,4 +1,4 @@
-function [xVec, uVec, vVec] = Simulator(x0, v0, Simulation, Dynamics, GlobalIntFunction, LocalIntFunction, Environment)
+function [xVec, uVec, vVec] = Simulator(x0, v0, Simulation, Dynamics, GlobalIntFunction, LocalIntFunction, Environment, Ctrl_pars)
 %
 %Simulator executes a complete simulation of the swarm.
 %   This function is called by a launcher script (Launcher, SequentialLauncher...).
@@ -32,6 +32,7 @@ arguments
     GlobalIntFunction   struct = struct('function','None')
     LocalIntFunction    struct = struct('function','None')
     Environment         struct = struct()
+    Ctrl_pars           struct = struct()
 end
 
 assert(ismember(size(x0,2), [2,3]), 'x0 must have second dimension equal to 2 or 3!')
@@ -62,7 +63,7 @@ if isfield(Environment,'Inputs') && isfield(Environment.Inputs,'Points')
     y_vec = linspace(-Simulation.arena(2)/2,Simulation.arena(2)/2,1000);
     [x_mesh, y_mesh] = meshgrid(x_vec, y_vec);
     %F=scatteredInterpolant(Environment.Inputs.Points, Environment.Inputs.Values, 'linear', 'nearest');
-    F = griddedInterpolant(Environment.Inputs.Points,Environment.Inputs.Values, 'linear', 'nearest');
+    F = griddedInterpolant(Environment.Inputs.Points,Environment.Inputs.Values{1}, 'linear', 'nearest');
 end
     
 %% Instantiate Simulation Window
@@ -89,6 +90,7 @@ end
 epsilon = Simulation.dT/100;
 x=x0;
 N=size(x,1);
+h = waitbar(0, 'Simulation in Progress'); % Create a waitbar
 
 
 %% Preallocate variables
@@ -121,9 +123,17 @@ if isfield(Environment,'Inputs')
 end
 disp(log_txt);
 
-%% Run Simulation
+%% ----------------- Run Simulation ---------------------
+
+%Initialization
 t=0;
 count=1;                                        % sampling iteration
+
+
+if isfield(Ctrl_pars,"hist")
+    hist=Ctrl_pars.hist_0;
+end
+[envInput,~,u_a] = Environment.Inputs.Input_function(x,hist);
 
 while t<Simulation.Tmax
     % Compute inputs from interactions
@@ -133,11 +143,27 @@ while t<Simulation.Tmax
     
     % Compute environmental inputs
     if isfield(Environment,'Inputs')
-        if isfield(Environment.Inputs,'Points')
+        
+        if isfield(Environment.Inputs,'Input_function')
+            if mod(t,Ctrl_pars.dt)==0
+                if isfield(Ctrl_pars,'hist')
+                    [envInput,hist,u] = Environment.Inputs.Input_function(x,hist);
+                    u_a = (u + u_a)/2;
+                else
+                    envInput = Environment.Inputs.Input_function(x);
+                end
+            end
+        elseif isfield(Environment.Inputs,'Points')
             envInput = F(x(:,1),x(:,2));
         elseif isfield(Environment.Inputs,'Times')
             envInput = ones(N,1) * interp1(Environment.Inputs.Times, Environment.Inputs.Values, t, Environment.Inputs.InterpMethod);
         end
+
+    end
+
+    if isfield(Environment,'Inputs') && isfield(Environment.Inputs,'Points') && isfield(Environment.Inputs,'Times')
+        time = find(Environment.Inputs.Times<=t,1,'last');
+        F = griddedInterpolant(Environment.Inputs.Points,Environment.Inputs.Values{time}, 'linear', 'nearest');
     end
     
     % Acquire data
@@ -187,6 +213,12 @@ while t<Simulation.Tmax
     % Update time
     t=t+Simulation.dT;
     t=Simulation.dT*round(t/Simulation.dT);
+    
+    if mod(t,100*Simulation.dT)==0
+        waitbar(t / Simulation.Tmax, h);
+    end
+    
+
 end
 
 xVec(count,:,:)=x;
@@ -199,6 +231,14 @@ if Simulation.recordVideo
 end
 
 %% PLOTS
+
+figure (20);
+[x_m,y_m]=ndgrid(Environment.Inputs.Points{1},Environment.Inputs.Points{2});
+surf(x_m,y_m,u_a);
+shading interp
+view(2)
+colorbar;
+clim([0 1])
 
 % plot swarm
 if Simulation.drawON
@@ -216,5 +256,13 @@ if Simulation.drawON
     if isfield(Environment,'boundary'); plotBoundary(Environment.boundary); end
 end
 
+close(h); % Close the waitbar when done
+
+
 end
+
+
+
+
+
 

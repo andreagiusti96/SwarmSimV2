@@ -20,7 +20,7 @@ outputDir='./Output';
 %outputDir='/Users/andrea/Library/CloudStorage/OneDrive-UniversitàdiNapoliFedericoII/Andrea_Giusti/Projects/DOME/simulations';
 outputDir='';
 
-N=400;                      % number of agents (N)
+N=1000;                      % number of agents (N)
 D=2;                        % number of dimensions [2 or 3]
 
 %% Analysis options
@@ -33,15 +33,15 @@ px_size = 1.25;             % size of a pixel [um]
 %% Simulation parameters
 % All these fields are mandatory
 Simulation=struct();
-Simulation.Tmax = 180;                  % maximum simulation time
+Simulation.Tmax = 1500;                  % maximum simulation time
 Simulation.deltaT = 0.5;                % sampling time step
 Simulation.dT =     0.01;               % integration time step
 Simulation.arena = [1920,1080]*px_size; % size of the simulation window
 Simulation.drawON=false;                % draw swarm during simulation (if N is large slows down the simulation)
 Simulation.drawTraj=0;                  % draw trajectories of the agents (if N is large slows down the simulation)
 Simulation.recordVideo=false;           % record video of the simulation (if true drawON must be true)
-Simulation.agentShape = "rod";          % shape to plot the agents "rod" or any defualt marker key ('.','+','diamond',...)
-Simulation.agentSize = 45;              % size to plot the agents
+Simulation.agentShape = ".";          % shape to plot the agents "rod" or any defualt marker key ('.','+','diamond',...)
+Simulation.agentSize = 10;              % size to plot the agents
 Simulation.timeInstants = [0:Simulation.deltaT:Simulation.Tmax];
 
 %% Initial conditions
@@ -104,10 +104,10 @@ Environment.Inputs.InterpMethod = 'previous';
 % Environment.Inputs.InterpMethod = 'linear';
 % Environment.Inputs.Times  = 'None'; 
 % Environment.Inputs.Values = 'None'; 
-Environment.Inputs.Times  = [0, 5, 10, Simulation.Tmax]; 
+% Environment.Inputs.Times  = [0, 5, 10, Simulation.Tmax]; 
 Environment.Inputs.Values = [0, 1, 0, 0];
 
-% Environment.boundary = Simulation.arena * 2;
+Environment.boundary = Simulation.arena*1;
 
 
 %% Render parameters
